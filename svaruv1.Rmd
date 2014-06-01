@@ -217,3 +217,35 @@ legend(600,0.2,legend=c("None vs. SVA","RUV CP vs SVA","RUV Emp vs SVA"),col=tro
 ```
 
 
+### Timing comparison
+
+```{r ,dependson="deresults"}
+empruv <- function(){
+  y <- DGEList(counts=counts(set), group=x)
+  y <- calcNormFactors(y, method="upperquartile")
+  y <- estimateGLMCommonDisp(y, design)
+  y <- estimateGLMTagwiseDisp(y, design)
+  
+  fit <- glmFit(y, design)
+  lrt <- glmLRT(fit, coef=2)
+
+  top <- topTags(lrt, n=nrow(set))$table
+  empirical <- rownames(set)[which(!(rownames(set) %in% rownames(top)[1:5000]))]
+  ruvEmp <- RUVg(counts(set), empirical, k=1) 
+}
+
+system.time(sva(dat,mod,mod0,n.sv=1))
+system.time(RUVg(counts(set), spikes, k=1))
+system.time(empruv())
+```
+
+
+### Session Info
+
+```{r}
+sessionInfo()
+```
+
+
+
+

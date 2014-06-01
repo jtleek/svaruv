@@ -379,3 +379,117 @@ legend(600,0.2,legend=c("None vs. SVA","RUV CP vs SVA","RUV Emp vs SVA"),col=tro
 ![plot of chunk resultscomp](figure/resultscomp.png) 
 
 
+### Timing comparison
+
+
+```r
+empruv <- function(){
+  y <- DGEList(counts=counts(set), group=x)
+  y <- calcNormFactors(y, method="upperquartile")
+  y <- estimateGLMCommonDisp(y, design)
+  y <- estimateGLMTagwiseDisp(y, design)
+  
+  fit <- glmFit(y, design)
+  lrt <- glmLRT(fit, coef=2)
+
+  top <- topTags(lrt, n=nrow(set))$table
+  empirical <- rownames(set)[which(!(rownames(set) %in% rownames(top)[1:5000]))]
+  ruvEmp <- RUVg(counts(set), empirical, k=1) 
+}
+
+system.time(sva(dat,mod,mod0,n.sv=1))
+```
+
+```
+## Number of significant surrogate variables is:  1 
+## Iteration (out of 5 ):1  2  3  4  5
+```
+
+```
+##    user  system elapsed 
+##   0.359   0.044   0.404
+```
+
+```r
+system.time(RUVg(counts(set), spikes, k=1))
+```
+
+```
+##    user  system elapsed 
+##   1.475   0.004   1.479
+```
+
+```r
+system.time(empruv())
+```
+
+```
+##    user  system elapsed 
+##   3.580   0.158   3.739
+```
+
+
+### Session Info
+
+
+```r
+sessionInfo()
+```
+
+```
+## R version 3.1.0 (2014-04-10)
+## Platform: x86_64-apple-darwin10.8.0 (64-bit)
+## 
+## locale:
+## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+## 
+## attached base packages:
+## [1] parallel  stats     graphics  grDevices utils     datasets  methods  
+## [8] base     
+## 
+## other attached packages:
+##  [1] ffpe_1.9.0               TTR_0.22-0              
+##  [3] xts_0.9-7                zoo_1.7-11              
+##  [5] RSkittleBrewer_1.1       zebrafishRNASeq_0.99.2  
+##  [7] RUVSeq_0.99.2            edgeR_3.7.1             
+##  [9] limma_3.21.4             EDASeq_1.99.1           
+## [11] ShortRead_1.23.11        GenomicAlignments_1.1.11
+## [13] Rsamtools_1.17.16        GenomicRanges_1.17.17   
+## [15] GenomeInfoDb_1.1.6       Biostrings_2.33.9       
+## [17] XVector_0.5.6            IRanges_1.99.15         
+## [19] S4Vectors_0.0.7          BiocParallel_0.7.2      
+## [21] Biobase_2.25.0           BiocGenerics_0.11.2     
+## [23] sva_3.11.0               mgcv_1.7-29             
+## [25] nlme_3.1-117             corpcor_1.6.6           
+## [27] knitr_1.6               
+## 
+## loaded via a namespace (and not attached):
+##  [1] affy_1.43.2            affyio_1.33.0          annotate_1.43.4       
+##  [4] AnnotationDbi_1.27.7   aroma.light_2.1.0      base64_1.1            
+##  [7] BatchJobs_1.2          BBmisc_1.6             beanplot_1.1          
+## [10] BiocInstaller_1.15.5   biomaRt_2.21.0         bitops_1.0-6          
+## [13] brew_1.0-6             BSgenome_1.33.8        bumphunter_1.5.3      
+## [16] codetools_0.2-8        colorspace_1.2-4       DBI_0.2-7             
+## [19] DESeq_1.17.0           digest_0.6.4           doRNG_1.6             
+## [22] evaluate_0.5.5         fail_1.2               foreach_1.4.2         
+## [25] formatR_0.10           genefilter_1.47.5      geneplotter_1.43.0    
+## [28] GenomicFeatures_1.17.9 grid_3.1.0             hwriter_1.3           
+## [31] illuminaio_0.7.0       iterators_1.0.7        KernSmooth_2.23-12    
+## [34] lattice_0.20-29        latticeExtra_0.6-26    locfit_1.5-9.1        
+## [37] lumi_2.17.0            MASS_7.3-33            Matrix_1.1-3          
+## [40] matrixStats_0.8.14     mclust_4.3             methylumi_2.11.1      
+## [43] minfi_1.11.7           multtest_2.21.0        nleqslv_2.1.1         
+## [46] nor1mix_1.1-4          pkgmaker_0.22          plyr_1.8.1            
+## [49] preprocessCore_1.27.0  R.methodsS3_1.6.1      R.oo_1.18.0           
+## [52] RColorBrewer_1.0-5     Rcpp_0.11.1            RCurl_1.95-4.1        
+## [55] registry_0.2           reshape_0.8.5          rngtools_1.2.4        
+## [58] RSQLite_0.11.4         rtracklayer_1.25.9     sendmailR_1.1-2       
+## [61] sfsmisc_1.0-25         siggenes_1.39.0        splines_3.1.0         
+## [64] stats4_3.1.0           stringr_0.6.2          survival_2.37-7       
+## [67] tools_3.1.0            XML_3.98-1.1           xtable_1.7-3          
+## [70] zlibbioc_1.11.1
+```
+
+
+
+
